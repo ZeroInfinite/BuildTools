@@ -1,10 +1,18 @@
-<!--
+﻿<!--
 WARNING: These targets are intended for building Microsoft's ASP.NET Core repos, and is not intended
 for use outside of Microsoft.
 -->
 <Project>
   <Import Project="$(MSBuildThisFileDirectory)..\targets\BuildNumber.targets" />
+  <Import Project="$(MSBuildThisFileDirectory)..\targets\Resx.targets"/>
   <Import Project="$(MSBuildThisFileDirectory)GenerateAssemblyInfo.targets" />
   <Import Project="$(MSBuildThisFileDirectory)Git.targets" />
   <Import Project="$(MSBuildThisFileDirectory)Workarounds.targets" />
+
+  <Target Name="GenerateCSharpForResx" 
+          DependsOnTargets="PrepareResourceNames;CoreGenerateCSharpForResources" />
+  
+  <Target Name="_ResolveEmbeddedResources" 
+          DependsOnTargets="PrepareResourceNames" 
+          Returns="@(EmbeddedResources)" />
 </Project>

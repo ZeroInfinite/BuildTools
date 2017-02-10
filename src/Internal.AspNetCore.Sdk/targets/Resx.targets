@@ -1,0 +1,20 @@
+﻿<Project>
+  
+  <Target Name="CoreGenerateCSharpForResources">
+    
+    <RemoveDuplicates Inputs="@(EmbeddedResource)">
+      <Output TaskParameter="Filtered" ItemName="_ResxFiles"/>
+    </RemoveDuplicates>
+    
+    <ItemGroup>
+      <_ResxFiles Update="@(_Temporary)" Condition="'%(_Temporary.GeneratedFileName)'==''">
+        <GeneratedFileName>Properties\%(FileName).Designer.cs</GeneratedFileName>
+      </_ResxFiles>
+    </ItemGroup>
+
+    <GenerateResxDesignerFiles ResourceFiles="@(_ResxFiles)">
+      <Output TaskParameter="FileWrites" ItemName="FileWrites" />
+    </GenerateResxDesignerFiles>
+  </Target>
+    
+</Project>

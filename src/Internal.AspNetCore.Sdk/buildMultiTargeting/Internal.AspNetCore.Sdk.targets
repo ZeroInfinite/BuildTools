@@ -1,7 +1,25 @@
-<!--
+﻿<!--
 WARNING: These targets are intended for building Microsoft's ASP.NET Core repos, and is not intended
 for use outside of Microsoft.
 -->
 <Project>
   <Import Project="$(MSBuildThisFileDirectory)..\targets\BuildNumber.targets" />
+
+  <Import Project="$(MSBuildThisFileDirectory)..\targets\Resx.targets" />
+
+  <Target Name="_ResolveEmbeddedResources">
+    <ItemGroup>
+      <_TargetFrameworks Remove="@(_TargetFrameworks)" />
+      <_TargetFrameworks Include="$(TargetFrameworks)" />
+    </ItemGroup>
+    <MSBuild Projects="$(MSBuildProjectFullPath)"
+             Targets="_ResolveEmbeddedResources"
+             Properties="TargetFramework=%(_TargetFrameworks.Identity)">
+      <Output TaskParameter="TargetOutputs" ItemName="EmbeddedResource"/>
+    </MSBuild>
+  </Target>
+
+  <Target Name="GenerateCSharpForResx"
+          DependsOnTargets="_ResolveEmbeddedResources;CoreGenerateCSharpForResources" />
+
 </Project>

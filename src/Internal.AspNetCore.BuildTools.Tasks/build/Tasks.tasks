@@ -1,8 +1,12 @@
 ﻿<Project>
+  
   <PropertyGroup>
     <_BuildToolsAssemblyTfm Condition="'$(MSBuildRuntimeType)' == 'Core'">netstandard1.3</_BuildToolsAssemblyTfm>
     <_BuildToolsAssemblyTfm Condition="'$(MSBuildRuntimeType)' != 'Core'">net46</_BuildToolsAssemblyTfm>
+    <_BuildToolsTaskAssembly>$(MSBuildThisFileDirectory)..\tools\$(_BuildToolsAssemblyTfm)\Internal.AspNetCore.BuildTools.Tasks.dll</_BuildToolsTaskAssembly>
   </PropertyGroup>
-  <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\$(_BuildToolsAssemblyTfm)\Internal.AspNetCore.BuildTools.Tasks.dll"
-             TaskName="Microsoft.AspNetCore.BuildTools.GetGitCommitInfo" />
+
+  <UsingTask TaskName="Microsoft.AspNetCore.BuildTools.GetGitCommitInfo" AssemblyFile="$(_BuildToolsTaskAssembly)" />
+  <UsingTask TaskName="Microsoft.AspNetCore.BuildTools.GenerateResxDesignerFiles" AssemblyFile="$(_BuildToolsTaskAssembly)" />
+
 </Project>
