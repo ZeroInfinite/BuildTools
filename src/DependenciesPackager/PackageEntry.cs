@@ -1,18 +1,17 @@
 ﻿using System.Collections.Generic;
-using Microsoft.DotNet.ProjectModel;
-using Microsoft.DotNet.ProjectModel.Compilation;
+using NugetReferenceResolver;
 
 namespace DependenciesPackager
 {
     internal class PackageEntry
     {
-        public IDictionary<LibraryAsset, int> CrossGenExitCode { get; set; } = new Dictionary<LibraryAsset, int>();
+        public IDictionary<PackageAssembly, int> CrossGenExitCode { get; set; } = new Dictionary<PackageAssembly, int>();
 
-        public PackageDescription Library { get; set; }
+        public Package Library { get; set; }
 
-        public IReadOnlyList<LibraryAsset> Assets { get; set; }
+        public IReadOnlyList<PackageAssembly> Assets { get; set; }
 
-        public IDictionary<LibraryAsset, IList<string>> CrossGenOutput { get; } =
-            new Dictionary<LibraryAsset, IList<string>>();
+        public IDictionary<PackageAssembly, IList<string>> CrossGenOutput { get; } =
+            new Dictionary<PackageAssembly, IList<string>>();
     }
 }

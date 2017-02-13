@@ -5,31 +5,25 @@ using System.IO.Compression;
 using System.Linq;
 using System.Reflection.PortableExecutable;
 using System.Text;
-using Microsoft.DotNet.ProjectModel;
 using Microsoft.Extensions.Logging;
+using NugetReferenceResolver;
 
 namespace DependenciesPackager
 {
     internal class OutputFilesContext : IDisposable
     {
         private const int CrossGenFlag = 4;
-        private readonly string _restoreFolder;
-        private readonly Project _project;
         private ILogger _logger;
 
         public OutputFilesContext(
             string destination,
             string version,
             string runtime,
-            string restoreFolder,
-            Project project,
             ILogger logger)
         {
             var architecture = runtime.Substring(runtime.LastIndexOf('-') + 1);
             OutputPath = Path.GetFullPath(Path.Combine(destination, version, architecture));
 
-            _restoreFolder = restoreFolder;
-            _project = project;
             _logger = logger;
         }
 

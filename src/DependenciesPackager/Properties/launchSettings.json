@@ -1,0 +1,9 @@
+﻿{
+  "profiles": {
+    "DependenciesPackager": {
+      "commandName": "Project",
+      "commandLineArgs":
+      "--project C:\\work\\Tests\\SplitPackages\\cache.csproj --sources C:\\work\\Tests\\SplitPackages\\Packages --sources C:\\work\\Tests\\SplitPackages\\ext --sources https://api.nuget.org/v3/index.json --destination C:\\work\\Tests\\SplitPackages\\Output --version 1.1.0 --runtime win7-x64 --prefix Antares --preserve-casing"
+    }
+  }
+}
