@@ -1,26 +1,22 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
+﻿<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
   <Import Project="..\..\build\common.props" />
-
   <PropertyGroup>
     <VersionPrefix>1.0.1</VersionPrefix>
-    <TargetFrameworks>netcoreapp1.0;net451</TargetFrameworks>
-    <RuntimeIdentifier Condition=" '$(TargetFramework)'!='netcoreapp1.0' ">win7-x64</RuntimeIdentifier>
+    <TargetFrameworks>netcoreapp1.1;net451</TargetFrameworks>
+    <RuntimeIdentifier Condition=" '$(TargetFramework)'!='netcoreapp1.1' ">win7-x64</RuntimeIdentifier>
     <Platform>AnyCPU</Platform>
     <OutputType>exe</OutputType>
   </PropertyGroup>
-
   <ItemGroup>
-    <PackageReference Include="Microsoft.DotNet.ProjectModel" Version="1.0.0-rc3-003121" />
     <PackageReference Include="Microsoft.Extensions.CommandLineUtils" Version="1.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
   </ItemGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">
-    <PackageReference Include="Microsoft.NETCore.App" Version="1.0.0" />
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.1' ">
     <PackageReference Include="System.Runtime.Loader" Version="4.0.0" />
   </ItemGroup>
-
+  <ItemGroup>
+    <ProjectReference Include="..\NugetReferenceResolver\NugetReferenceResolver.csproj" />
+  </ItemGroup>
   <!-- packaging settings-->
   <PropertyGroup>
     <NoPackageAnalysis>true</NoPackageAnalysis>
@@ -32,12 +28,10 @@
 
   <Target Name="PublishAll">
     <ItemGroup>
-      <_TargetFrameworks Remove="@(_TargetFrameworks)"/>
+      <_TargetFrameworks Remove="@(_TargetFrameworks)" />
       <_TargetFrameworks Include="$(TargetFrameworks)" />
     </ItemGroup>
-    <MSBuild Projects="$(MSBuildProjectFullPath)"
-             Targets="Publish"
-             Properties="TargetFramework=%(_TargetFrameworks.Identity)" />
+    <MSBuild Projects="$(MSBuildProjectFullPath)" Targets="Publish" Properties="TargetFramework=%(_TargetFrameworks.Identity)" />
   </Target>
 
   <Target Name="SetPackageDependencies" BeforeTargets="GenerateNuspec" DependsOnTargets="PublishAll">
@@ -45,5 +39,4 @@
       <NuspecProperties>version=$(PackageVersion)</NuspecProperties>
     </PropertyGroup>
   </Target>
-
 </Project>
