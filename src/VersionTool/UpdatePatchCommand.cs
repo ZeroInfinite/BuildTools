@@ -53,17 +53,43 @@ namespace VersionTool
                     var packageName = parsedPackageUpdate[0];
                     var newPackageVersion = parsedPackageUpdate[1];
 
-                    var repo = patchConfig.Repos.Where(r => r.Packages.Contains(packageName)).FirstOrDefault();
+                    Repository repo;
+                    try
+                    {
+                        repo = patchConfig.Repos.Where(r => r.Packages.Contains(packageName)).SingleOrDefault();
+                    }
+                    catch (InvalidOperationException)
+                    {
+                        Console.WriteLine($"Error: found more than one repo containing the package {packageName}.");
+                        throw;
+                    }
+
                     if (repo != null)
                     {
                         // update version
                         UpdateVersionCommand.UpdateVersion(
                             new List<string>(new[] { Path.Combine(repo.Path, "src", packageName) }),
                             new List<string>(),
-                            parsedPackageUpdate[1]);
+                            newPackageVersion);
+
+                        // update dependency
+                        UpdateDependencyCommand.UpdateDependency(
+                            new List<string>(new[] { directory }),
+                            new List<string>(),
+                            packageName,
+                            newPackageVersion);
 
                         // update entry in packages
-                        var package = patchConfig.Packages.First(p => string.Equals(p.Name, packageName, StringComparison.OrdinalIgnoreCase));
+                        Package package;
+                        try
+                        {
+                            package = patchConfig.Packages.Single(p => string.Equals(p.Name, packageName, StringComparison.OrdinalIgnoreCase));
+                        }
+                        catch (InvalidOperationException)
+                        {
+                            Console.WriteLine($"Error: found more than one entry in patch config for the package {packageName}.");
+                            throw;
+                        }
                         package.NewVersion = newPackageVersion;
                     }
                     else
@@ -72,8 +98,8 @@ namespace VersionTool
                         UpdateDependencyCommand.UpdateDependency(
                             new List<string>(new[] { directory }),
                             new List<string>(),
-                            parsedPackageUpdate[0],
-                            parsedPackageUpdate[1]);
+                            packageName,
+                            newPackageVersion);
                     }
                 }
             }
@@ -81,14 +107,26 @@ namespace VersionTool
             // Handle repo updates
             if (updateRepoOption.HasValue())
             {
-                var repo = patchConfig.Repos.Where(r => string.Equals(r.Name, updateRepoOption.Value(), StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
-
-                if (repo == null)
+                foreach (var repoUpdate in updateRepoOption.Values)
                 {
-                    throw new InvalidOperationException($"Repo {updateRepoOption.Value()} not found in patch config.");
-                }
+                    Repository repo;
+                    try
+                    {
+                        repo = patchConfig.Repos.Where(r => string.Equals(r.Name, repoUpdate, StringComparison.OrdinalIgnoreCase)).SingleOrDefault();
+                    }
+                    catch (InvalidOperationException)
+                    {
+                        Console.WriteLine($"Error: found more than one entry in the Repo section of the patch config for the repo {repoUpdate}.");
+                        throw;
+                    }
 
-                UpdatePackagesInRepo(repo, directory, patchConfig);
+                    if (repo == null)
+                    {
+                        throw new InvalidOperationException($"Repo {repoUpdate} not found in patch config.");
+                    }
+
+                    UpdatePackagesInRepo(repo, directory, patchConfig);
+                }
             }
 
             // Cascade updates
@@ -113,7 +151,17 @@ namespace VersionTool
         {
             foreach (var package in Utilities.EnumerateProjects(new[] { Path.Combine(repo.Path, "src") }))
             {
-                var unUpdatedPackage = patchConfig.Packages.Where(p => p.Name == package.Name && p.CurrentVersion == package.Version.ToString()).FirstOrDefault();
+                Package unUpdatedPackage = null;
+                try
+                {
+                    unUpdatedPackage = patchConfig.Packages.Where(p => p.Name == package.Name && p.CurrentVersion == package.Version.ToString()).SingleOrDefault();
+                }
+                catch (InvalidOperationException)
+                {
+                    Console.WriteLine($"Error: found more than one entry in patch config for the package {unUpdatedPackage?.Name ?? string.Empty}.");
+                    throw;
+                }
+
                 if (unUpdatedPackage != null)
                 {
                     Console.WriteLine($"{package.Name} is a src project and has not been updated in this patch, updating version.");
@@ -262,7 +310,16 @@ $@"No update rule found for package {package.Name} {package.Version}. Please add
             var reposWithSrc = patchConfig.Repos.Select(repo => Path.Combine(repo.Path, "src")).Where(Directory.Exists);
             foreach (var project in Utilities.EnumerateProjects(reposWithSrc))
             {
-                var package = patchConfig.Packages.Where(p => p.Name == project.Name).SingleOrDefault();
+                Package package = null;
+                try
+                {
+                    package = patchConfig.Packages.Where(p => p.Name == project.Name).SingleOrDefault();
+                }
+                catch (InvalidOperationException)
+                {
+                    Console.WriteLine($"Error: found more than one entry in patch config for the package {package?.Name ?? string.Empty}.");
+                    throw;
+                }
                 if (package != null)
                 {
                     package.NewVersion = project.Version.ToString();
