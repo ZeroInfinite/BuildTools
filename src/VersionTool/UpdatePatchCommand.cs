@@ -335,6 +335,9 @@ $@"No update rule found for package {package.Name} {package.Version}. Please add
                 }
             }
 
+            // Sort package list by alphabetical order
+            patchConfig.Packages.Sort();
+
             File.WriteAllText(path, JsonConvert.SerializeObject(patchConfig, Formatting.Indented, converters));
         }
     }
