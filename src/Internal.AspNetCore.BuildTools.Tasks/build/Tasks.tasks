@@ -11,4 +11,7 @@
   <UsingTask TaskName="Microsoft.AspNetCore.BuildTools.SetEnvironmentVariable" AssemblyFile="$(_BuildToolsAssembly)" />
   <UsingTask TaskName="Microsoft.AspNetCore.BuildTools.WaitForDebugger" AssemblyFile="$(_BuildToolsAssembly)" />
   
+  <!-- TODO remove when XmlPoke becomes available in MSBuild 15.2 -->
+  <UsingTask TaskName="Microsoft.AspNetCore.BuildTools.XmlPoke2" AssemblyFile="$(_BuildToolsAssembly)" />
+  
 </Project>
